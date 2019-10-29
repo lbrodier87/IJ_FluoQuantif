@@ -66,6 +66,8 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
         jCheckBox3 = new javax.swing.JCheckBox();
         jLabel9 = new javax.swing.JLabel();
         jTextField8 = new javax.swing.JTextField();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        jTextField9 = new javax.swing.JTextField();
 
         jTextField6.setText("jTextField6");
 
@@ -191,6 +193,10 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
 
         jTextField8.setText("2,3");
 
+        jCheckBox4.setText("background outside");
+
+        jTextField9.setText("1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -248,7 +254,11 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jCheckBox4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextField9)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -290,7 +300,9 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBox4)
+                    .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -651,9 +663,28 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
                 rm.runCommand(imp2_sum, "Measure");
             }
             
-            //Add a new square in the middle of r1 and r2 to measure background at center
-            Roi r3 = new ij.gui.Roi((double)(r1.getBounds().x + r2.getBounds().x)/2, (double)(r1.getBounds().y + r2.getBounds().y)/2, width, height);
-            rm.addRoi(r3);
+            //Add a new square in the middle of r1 and r2 to measure background at center            
+            if(!jCheckBox4.isSelected()){
+                //ORIGINAL
+                Roi r3 = new ij.gui.Roi((double)(r1.getBounds().x + r2.getBounds().x)/2, (double)(r1.getBounds().y + r2.getBounds().y)/2, width, height);
+                rm.addRoi(r3);
+            }else{
+                double dx = r2.getBounds().x - r1.getBounds().x;
+                double dy = r2.getBounds().y - r1.getBounds().y;
+                double angle = Math.atan(dy/dx);
+                //double d = Double.parseDouble(jTextField9.getText()) * (width+height)/2;
+                double d = (2*Math.sqrt(((double)width/2)*((double)width/2)+((double)height/2)*((double)height/2)))*Double.parseDouble(jTextField9.getText());
+                
+                if(dy>=0) dy = Math.abs(Math.sin(angle)) * d;
+                else dy = Math.abs(Math.sin(angle)) * -d;
+                if(dx>=0) dx = Math.abs(Math.cos(angle)) * d;  
+                else dx = Math.abs(Math.cos(angle)) * -d;
+                
+                double px1 = (double)r2.getBounds().x + (double)width/2;
+                double py1= (double)r2.getBounds().y  + (double)width/2;
+                Roi r3 = new ij.gui.Roi(px1 +dx -(double)width/2, py1 +dy -(double)height/2, width, height);
+                rm.addRoi(r3);
+            }
             //measure background for each channel
             for(int i=0; i<c.length; i++){
                 rm.select(2);            
@@ -858,6 +889,7 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;
+    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -877,5 +909,6 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField jTextField9;
     // End of variables declaration//GEN-END:variables
 }
