@@ -843,8 +843,27 @@ public class FluoQuantifFrame extends javax.swing.JFrame {
             }
             
             //background
-            Roi r3 = new ij.gui.Roi((double)(r1.getBounds().x + r2.getBounds().x)/2, (double)(r1.getBounds().y + r2.getBounds().y)/2, width, height);
-            rm.addRoi(r3);
+            if(!jCheckBox4.isSelected()){
+                //ORIGINAL
+                Roi r3 = new ij.gui.Roi((double)(r1.getBounds().x + r2.getBounds().x)/2, (double)(r1.getBounds().y + r2.getBounds().y)/2, width, height);
+                rm.addRoi(r3);
+            }else{
+                double dx = r2.getBounds().x - r1.getBounds().x;
+                double dy = r2.getBounds().y - r1.getBounds().y;
+                double angle = Math.atan(dy/dx);
+                //double d = Double.parseDouble(jTextField9.getText()) * (width+height)/2;
+                double d = (2*Math.sqrt(((double)width/2)*((double)width/2)+((double)height/2)*((double)height/2)))*Double.parseDouble(jTextField9.getText());
+                
+                if(dy>=0) dy = Math.abs(Math.sin(angle)) * d;
+                else dy = Math.abs(Math.sin(angle)) * -d;
+                if(dx>=0) dx = Math.abs(Math.cos(angle)) * d;  
+                else dx = Math.abs(Math.cos(angle)) * -d;
+                
+                double px1 = (double)r2.getBounds().x + (double)width/2;
+                double py1= (double)r2.getBounds().y  + (double)width/2;
+                Roi r3 = new ij.gui.Roi(px1 +dx -(double)width/2, py1 +dy -(double)height/2, width, height);
+                rm.addRoi(r3);
+            }
             for(int i=0; i<c.length; i++){
                 rm.select(2);            
                 imp2_sum.setC(c[i]);
